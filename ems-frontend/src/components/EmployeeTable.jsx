@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getAllEmployees } from "../services/employeeService";
-import { Button } from "bootstrap";
+import { deleteEmployee, getAllEmployees } from "../services/employeeService";
+import { useNavigate } from "react-router-dom";
 
 function EmployeeTable() {
 
@@ -8,8 +8,13 @@ function EmployeeTable() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    useEffect(() => {
+    const navigator = useNavigate();
 
+    useEffect(() => {
+        getEmployees();
+    }, []);
+
+    function getEmployees() {
         getAllEmployees()
             .then((response) => {
                 setEmployees(response.data);
@@ -21,57 +26,140 @@ function EmployeeTable() {
             .finally(() => {
                 setLoading(false);
             });
+    }
 
-    }, []);
+    function updateEmployee(id) {
+        navigator(`/edit-employee/${id}`);
+    }
+
+    function removeEmployee(id) {
+
+        if (window.confirm("Are you sure you want to delete this employee?")) {
+
+            deleteEmployee(id)
+                .then((response) => {
+                    console.log("Employee deleted with id " + id);
+                    getEmployees();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+    }
 
     if (loading) {
-        return <h3>Loading employees...</h3>;
+        return (
+            <div className="container mt-5 text-center">
+                <div className="spinner-border text-primary"></div>
+                <p className="mt-2">Loading employees...</p>
+            </div>
+        );
     }
 
     if (error) {
-        return <h3>{error}</h3>;
+        return (
+            <div className="container mt-5">
+                <div className="alert alert-danger text-center">
+                    {error}
+                </div>
+            </div>
+        );
     }
 
     return (
-    
-        <div className="employee-container">
-       
-            <h2>Employee List</h2>
-<button type="button" className="btn btn-primary">
-    Add Employee
-</button>
-            <table className="employee-table">
 
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Fitst Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
+        <div className="container mt-5">
 
-                <tbody>
+            <div className="card shadow">
 
-                    {employees.map((employee) => (
+                <div className="card-header bg-dark text-white d-flex justify-content-between align-items-center">
 
-                        <tr key={employee.id}>
+                    <h3 className="mb-0">
+                        Employee List
+                    </h3>
 
-                            <td>{employee.id}</td>
+                    <button
+                        className="btn btn-success"
+                        onClick={() => navigator("/add-employee")}
+                    >
+                        Add Employee
+                    </button>
 
-                            <td>{employee.firstName}</td>
+                </div>
 
-                            <td>{employee.lastName}</td>
+                <div className="card-body">
 
-                            <td>{employee.email}</td>
+                    {employees.length === 0 ? (
 
-                        </tr>
+                        <div className="alert alert-info text-center mb-0">
+                            No employees found.
+                        </div>
 
-                    ))}
+                    ) : (
 
-                </tbody>
+                        <div className="table-responsive">
 
-            </table>
+                            <table className="table table-bordered table-hover table-striped align-middle mb-0">
+
+                                <thead className="table-dark">
+
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Email</th>
+                                        <th className="text-center">Action</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {employees.map((employee) => (
+
+                                        <tr key={employee.id}>
+
+                                            <td>{employee.id}</td>
+
+                                            <td>{employee.firstName}</td>
+
+                                            <td>{employee.lastName}</td>
+
+                                            <td>{employee.email}</td>
+
+                                            <td className="text-center">
+
+                                                <button
+                                                    className="btn btn-info btn-sm me-2"
+                                                    onClick={() => updateEmployee(employee.id)}
+                                                >
+                                                    Update
+                                                </button>
+
+                                                <button
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => removeEmployee(employee.id)}
+                                                >
+                                                    Delete
+                                                </button>
+
+                                            </td>
+
+                                        </tr>
+
+                                    ))}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    )}
+
+                </div>
+
+            </div>
 
         </div>
     );

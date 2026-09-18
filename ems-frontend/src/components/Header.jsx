@@ -8,7 +8,6 @@ function Header() {
                 <nav>
                     <a href="/">Home</a>
                     <a href="/employees">Employees</a>
-                    <a href="/add-employee">Add Employee</a>
                 </nav>
 
             </div>

@@ -1,9 +1,9 @@
 function Header() {
     return (
-      <header className="header">
+        <header className="header">
             <div className="header-container">
 
-                <h1>Employee Management System</h1>
+                <h1>EMS</h1>
 
                 <nav>
                     <a href="/">Home</a>
